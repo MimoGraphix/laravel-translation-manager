@@ -237,7 +237,7 @@ class Manager
             if (!$this->config[ 'ignore_json' ]) {
                 if (preg_match_all("/$stringPattern/siU", $file->getContents(), $matches)) {
                     foreach ($matches[ 'string' ] as $key) {
-                        if (preg_match("/(^[a-zA-Z0-9_-]+([.][^\1)\ ]+)+$)/siU", $key, $groupMatches)) {
+                        if (preg_match("/(^[\/a-zA-Z0-9_-]+([.][^\1)\ ]+)+$)/siU", $key, $groupMatches)) {
                             // group{.group}.key format, already in $groupKeys but also matched here
                             // do nothing, it has to be treated as a group
                             continue;
@@ -417,6 +417,7 @@ class Manager
 
     public function exportTranslations($group = null, $json = false)
     {
+        $group = basename($group);
         $basePath = $this->app[ 'path.lang' ];
 
         if (!is_null($group) && !$json) {
@@ -435,6 +436,7 @@ class Manager
                     ->get());
 
                 foreach ($tree as $locale => $groups) {
+                    $locale = basename($locale);
                     if (isset($groups[ $group ])) {
                         $translations = $groups[ $group ];
                         $path = $this->app[ 'path.lang' ];
@@ -558,7 +560,7 @@ class Manager
 
     public function addLocale($locale)
     {
-        $localeDir = $this->app->langPath().'/'.$locale;
+        $localeDir = $this->app->langPath().'/'.basename($locale);
 
         $this->ignoreLocales = array_diff($this->ignoreLocales, [$locale]);
         $this->saveIgnoredLocales();
