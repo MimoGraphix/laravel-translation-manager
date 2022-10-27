@@ -1,7 +1,7 @@
 {
   "name": "barryvdh/laravel-translation-manager",
   "description": "Manage Laravel Translations",
-  "version":"0.7",
+  "version":"0.7.1",
   "keywords": [
     "laravel",
     "translations",
@@ -12,6 +12,10 @@
     {
       "name": "Barry vd. Heuvel",
       "email": "barryvdh@gmail.com"
+    },
+    {
+      "name": "MimoGraphix",
+      "email": "mimographix@gmail.com"
     }
   ],
   "require": {

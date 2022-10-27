@@ -175,7 +175,7 @@ class Manager
             '('.                                         // Start a new group to match:
             '[a-zA-Z0-9_-]+'.                            // Must start with group
             '[\.]'.                                      // Group ends with dot
-            "([a-zA-Z0-9_\-\.]*)".                       // Be followed by zero or more items/keys
+            "([a-zA-Z0-9_\-\.\|]*)".                     // Be followed by zero or more items/keys
             '[a-zA-Z0-9]'.                               // Must end with a number or letter
             ')'.                                         // Close group
             "[\'\"]\s?".                                 // Closing quote
@@ -237,7 +237,7 @@ class Manager
             if (!$this->config[ 'ignore_json' ]) {
                 if (preg_match_all("/$stringPattern/siU", $file->getContents(), $matches)) {
                     foreach ($matches[ 'string' ] as $key) {
-                        if (preg_match("/(^[\/a-zA-Z0-9_-]+([.][^\1)\ ]+)+$)/siU", $key, $groupMatches)) {
+                        if (preg_match("/(^[\/a-zA-Z0-9_-\|]+([.][^\1)\ ]+)+$)/siU", $key, $groupMatches)) {
                             // group{.group}.key format, already in $groupKeys but also matched here
                             // do nothing, it has to be treated as a group
                             continue;
@@ -366,7 +366,7 @@ class Manager
         if (!in_array($group, $this->config[ 'exclude_groups' ])) {
             if ($this->config[ 'ignore_json' ]) {
                 //ignore all non alphanumeric strings
-                if (preg_match("/[a-zA-Z0-9-_\.]*/", $key, $groupMatches)) {
+                if (preg_match("/[a-zA-Z0-9-_\.\|]*/", $key, $groupMatches)) {
                     if ($groupMatches[ 0 ] != $key) {
                         return;
                     }
@@ -455,7 +455,9 @@ class Manager
 
                             $temp_path = rtrim($path.DIRECTORY_SEPARATOR.$subfolder_level, DIRECTORY_SEPARATOR);
                             if (!is_dir($temp_path)) {
-                                mkdir($temp_path, 0777, true);
+                                if (!mkdir($temp_path, 0777, true) && !is_dir($temp_path)) {
+                                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $temp_path));
+                                }
                             }
                         }
 
