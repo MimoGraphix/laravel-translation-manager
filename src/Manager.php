@@ -216,7 +216,6 @@ class Manager
             if (preg_match_all("/$groupPattern/si", $file->getContents(), $matches)) {
                 // Get all matches
                 foreach ($matches[ 2 ] as $i => $key) {
-                    $found++;
                     if (!isset($groupKeys[ $key ])) {
                         $groupKeys[ $key ] = [
                             "sources" => [],
@@ -255,6 +254,9 @@ class Manager
             }
         }
         // Remove duplicates
+        $groupKeys = array_unique($groupKeys);
+        $stringKeys = array_unique($stringKeys);
+
         ksort($groupKeys);
 
         if ($section != null) {
@@ -515,7 +517,8 @@ class Manager
     {
         $array = [];
         foreach ($translations as $translation) {
-            if ($json) {
+            // For JSON and sentences, do not use dotted notation
+            if ($json || Str::contains($translation->key, [' ']) || Str::endsWith($translation->key, ['.'])) {
                 $this->jsonSet($array[ $translation->locale ][ $translation->group ], $translation->key,
                     $translation->value);
             } else if( isset($translation->value) && $translation->value != "" ){

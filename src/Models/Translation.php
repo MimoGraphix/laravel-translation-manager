@@ -9,10 +9,10 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property integer $id
  * @property integer $status
- * @property string $locale
- * @property string $group
- * @property string $key
- * @property string $value
+ * @property string  $locale
+ * @property string  $group
+ * @property string  $key
+ * @property string  $value
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
@@ -53,6 +53,20 @@ class Translation extends Model
         }
 
         return $query->select(DB::raw($select));
+    }
+
+    /**
+     * Get the current connection name for the model.
+     *
+     * @return string|null
+     */
+    public function getConnectionName()
+    {
+        if ($connection = config('translation-manager.db_connection')){
+            return $connection;
+        }
+
+        return parent::getConnectionName();
     }
 
     /**

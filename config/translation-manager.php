@@ -67,6 +67,11 @@ return [
     ],
 
     /**
+     * Database connection name to allow for different db connection for the translations table.
+     */
+    'db_connection' => env('TRANSLATION_MANAGER_DB_CONNECTION', null),
+
+    /**
      * if true finding new translations will be disabled while users browse application
      */
     'ignore_new_trans' => false,
