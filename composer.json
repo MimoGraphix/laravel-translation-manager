@@ -1,7 +1,7 @@
 {
   "name": "barryvdh/laravel-translation-manager",
   "description": "Manage Laravel Translations",
-  "version":"0.8.0",
+  "version":"0.8.1",
   "keywords": [
     "laravel",
     "translations",
@@ -19,7 +19,7 @@
     }
   ],
   "require": {
-    "php": ">=7.2",
+    "php": ">=8.0",
     "illuminate/support": "^9|^10",
     "illuminate/translation": "^9|^10",
     "symfony/finder": "^6"
