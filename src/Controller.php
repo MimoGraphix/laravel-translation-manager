@@ -142,7 +142,7 @@ class Controller extends BaseController
             $name = request()->get('name');
             $value = request()->get('value');
 
-            list($locale, $key) = explode('|', $name, 2);
+            list($locale, $key) = array_pad(explode('|', $name, 2), 2, null);
             $translation = Translation::firstOrNew([
                 'locale' => $locale,
                 'group' => $groupKey,

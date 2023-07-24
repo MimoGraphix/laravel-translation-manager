@@ -226,7 +226,7 @@ class Manager
                     if (isset($matches[ 5 ]) && isset($matches[ 5 ][ $i ]) && $matches[ 5 ][ $i ] != "") {
                         $attributes = explode(",", static::str_strip_whitespace($matches[ 5 ][ $i ]));
                         foreach ($attributes as $attribute) {
-                            list($item, $_rest) = explode("=", $attribute, 2);
+                            list($item, $_rest) = array_pad(explode("=", $attribute, 2), 2, null);
                             $groupKeys[ $key ][ "variables" ][] = str_replace(['"', "'"], "", $item);
                         }
                     }
@@ -278,13 +278,13 @@ class Manager
             }
 
             // Split the group and item
-            list($group, $item) = explode('.', $key, 2);
+            list($group, $item) = array_pad(explode('.', $key, 2), 2, null);
             $this->missingKey('', $group, $item, array_unique($data[ 'variables' ]));
 
             // save location in strings
             $files = array_unique($data[ 'sources' ]);
             foreach ($files as $file) {
-                list($path, $line) = explode(':', $file);
+                list($path, $line) = array_pad(explode(':', $file),2, null);
                 \Illuminate\Support\Facades\DB::table('ltm_translation_sources')->insert([
                     "group" => $group,
                     "key" => $item,
