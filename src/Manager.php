@@ -261,8 +261,8 @@ class Manager
             }
         }
         // Remove duplicates
-        $groupKeys = array_unique($groupKeys, flags: SORT_REGULAR);
-        $stringKeys = array_unique($stringKeys, flags: SORT_REGULAR);
+        $groupKeys = array_unique($groupKeys, SORT_REGULAR);
+        $stringKeys = array_unique($stringKeys, SORT_REGULAR);
 
         ksort($groupKeys);
 
@@ -276,7 +276,7 @@ class Manager
         }
 
         //clean variables and sources
-        DB::statement('TRUNCATE TABLE `ltm_translation_sources`');
+//        DB::statement('TRUNCATE TABLE `ltm_translation_sources`');
 
         // Add the translations to the database, if not existing.
         foreach ($groupKeys as $key => $data) {
