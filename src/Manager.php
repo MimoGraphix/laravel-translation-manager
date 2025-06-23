@@ -2,7 +2,9 @@
 
 namespace Barryvdh\TranslationManager;
 
+use App\Helpers\PortalHelper;
 use Barryvdh\TranslationManager\Events\TranslationsExportedEvent;
+use Barryvdh\TranslationManager\Jobs\TranslationSaveJob;
 use Barryvdh\TranslationManager\Models\Translation;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
@@ -372,6 +374,7 @@ class Manager
 
     public function missingKey($namespace, $group, $key, $parameters = [])
     {
+        $job = new TranslationSaveJob();
         if (!in_array($group, $this->config['exclude_groups'])) {
             if ($this->config['ignore_json']) {
                 //ignore all non alphanumeric strings
@@ -382,22 +385,11 @@ class Manager
                 }
             }
 
-            Translation::firstOrCreate([
-                'locale' => $this->app['config']['app.locale'],
-                'group' => $group,
-                'key' => $key,
-            ]);
+            $job->setTranslation($this->app['config']['app.locale'], $group, $key );
 
             if (count($parameters) > 0) {
-                Translation::possibleVariables($group, $key)->delete();
-
-                // save possible variables
                 foreach ($parameters as $parameter) {
-                    DB::table('ltm_translation_variables')->insert([
-                        "group" => $group,
-                        "key" => $key,
-                        "attribute" => $parameter,
-                    ]);
+                    $job->addVariable($parameter);
                 }
             }
 
@@ -406,21 +398,15 @@ class Manager
 
                 // ignore url when part of config->route->prefix
                 if (!Str::contains($url, $this->config['route']['prefix'])) {
-                    // save URL with translation key
-                    $_testUrl = DB::table('ltm_translation_urls')
-                        ->where('group', $group)
-                        ->where('key', $key)
-                        ->where('url', $url);
-
-                    if ($_testUrl->count() == 0) {
-                        DB::table('ltm_translation_urls')->insert([
-                            'group' => $group,
-                            'key' => $key,
-                            'url' => $url,
-                        ]);
-                    }
+                    $job->setUrl($url);
                 }
             }
+
+            if($this->config['queue_as_job']['connection'] !== false){
+                $job->onConnection($this->config['queue_as_job']['connection']);
+                $job->onQueue($this->config['queue_as_job']['queue']);
+            }
+            app(\Illuminate\Contracts\Bus\Dispatcher::class)->dispatch($job);
         }
     }
 

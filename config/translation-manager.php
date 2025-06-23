@@ -10,8 +10,8 @@ return [
     | The default group settings for the elFinder routes.
     |
     */
-    'route'          => [
-        'prefix'     => 'translations',
+    'route' => [
+        'prefix' => 'translations',
         'middleware' => 'auth',
     ],
 
@@ -46,12 +46,12 @@ return [
      *        'de',
      *    )
      */
-    'exclude_langs'  => [],
+    'exclude_langs' => [],
 
     /**
      * Export translations with keys output alphabetically.
      */
-    'sort_keys'     => false,
+    'sort_keys' => false,
 
     'trans_functions' => [
         'trans',
@@ -85,6 +85,15 @@ return [
      * Translations without source position will be marked as red
      */
     'warn_in_code' => false,
+
+    /**
+     * Queue as a Job
+     * name of the queue
+     */
+    'queue_as_job' => [
+        'connection' => env('TRANSLATION_MANAGER_QUEUE_CONNECTION', false),
+        'queue' => "translations",
+    ],
 
     /*
     |--------------------------------------------------------------------------
