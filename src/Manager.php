@@ -11,6 +11,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Lang;
 use RuntimeException;
@@ -18,6 +19,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Throwable;
 use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
@@ -40,6 +42,8 @@ class Manager
     protected $ignoreLocales;
 
     protected $ignoreFilePath;
+
+    protected $cachedNew = [];
 
     public function __construct(Application $app, Filesystem $files, Dispatcher $events)
     {
@@ -385,7 +389,7 @@ class Manager
                 }
             }
 
-            $job->setTranslation($this->app['config']['app.locale'], $group, $key );
+            $job->setTranslation($this->app['config']['app.locale'], $group, $key);
 
             if (count($parameters) > 0) {
                 foreach ($parameters as $parameter) {
@@ -402,14 +406,20 @@ class Manager
                 }
             }
 
-            if($this->config['queue_as_job']['connection'] !== false){
+            if ($this->config['queue_as_job']['connection'] !== false) {
                 $job->onConnection($this->config['queue_as_job']['connection']);
                 $job->onQueue($this->config['queue_as_job']['queue']);
             }
-            try{
+
+            try {
+                if (isset($this->cachedNew[$group . "-" . $key])) {
+                    return;
+                }
+
                 app(\Illuminate\Contracts\Bus\Dispatcher::class)->dispatch($job);
-            }catch (\Throwable $exception){
-                \Illuminate\Support\Facades\Log::error($exception->getMessage());
+                $this->cachedNew[$group . "-" . $key] = true;
+            } catch (Throwable $exception) {
+                Log::error($exception->getMessage());
             }
         }
     }
