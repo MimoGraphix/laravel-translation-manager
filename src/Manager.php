@@ -406,7 +406,11 @@ class Manager
                 $job->onConnection($this->config['queue_as_job']['connection']);
                 $job->onQueue($this->config['queue_as_job']['queue']);
             }
-            app(\Illuminate\Contracts\Bus\Dispatcher::class)->dispatch($job);
+            try{
+                app(\Illuminate\Contracts\Bus\Dispatcher::class)->dispatch($job);
+            }catch (\Throwable $exception){
+                \Illuminate\Support\Facades\Log::error($exception->getMessage());
+            }
         }
     }
 
